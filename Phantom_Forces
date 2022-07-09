@@ -1,4 +1,9 @@
---[[ june 17 update log:
+--[[ july 7 update log:
++ Increased Walkspeed and Jumppower Max to 250
++ Removed Invisible
++ Fixed Ctrl+Click TP
++ Fixed Silent Aim
+-- june 17 update log:
 + Switched To Orion UI
 + Fixed Silent Aim
 + Fixed Invisible
@@ -63,18 +68,10 @@ end
 
 local orion = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local window = orion:MakeWindow({Name = "Darkhub Phantom Forces", HidePremium = false})
-local Aimbot = window:MakeTab({
-    Name = "Combat",
-})
-local GunMods = window:MakeTab({
-    Name = "Gun Mods",
-})
-local Esp = window:MakeTab({
-    Name = "Esp",
-})
-local Misc = window:MakeTab({
-    Name = "Miscellaneous",
-})
+local Aimbot = window:MakeTab({Name = "Combat"})
+local GunMods = window:MakeTab({Name = "Gun Mods"})
+local Esp = window:MakeTab({Name = "Esp"})
+local Misc = window:MakeTab({Name = "Miscellaneous"})
 local FovCircle = Drawing.new("Circle")
 FovCircle.Visible = Client.Toggles.UseFov
 FovCircle.Radius = Client.Values.Fov
@@ -88,32 +85,18 @@ DeadFovCircle.Color = Color3.new(1, 1, 1)
 DeadFovCircle.Thickness = 1
 DeadFovCircle.Position = Vector2.new(workspace.Camera.ViewportSize.X * 0.5, workspace.Camera.ViewportSize.Y * 0.5)
 
-local whitelistedcharacters = "abcdefghijklmnopqrstuvwxyz"
-
 local found = {}
-local hashes = {}
-for i, v in pairs(getnilinstances()) do
-    if v.ClassName == "ModuleScript" and (v.Name == "effects" or v.Name == "camera" or v.Name == "particle") then
+for i, v in pairs(getscripts()) do
+    if v.ClassName == "ModuleScript" and (v.Name == "effects" or v.Name == "camera" or v.Name == "particle" or v.Name == "network") then
         found[v.Name] = require(v)
     end
 end
 
-for i, v in pairs(getgc(false)) do
-    if getinfo(v).name == "loadgun" then
-        getgenv()["loadgun"] = v
-        break
-    end
-end
-
-found["network"] = debug.getupvalue(found.effects.breakwindow, 1)
 found["char"] = debug.getupvalue(found.effects.muzzleflash, 2)
 found["replication"] = debug.getupvalue(found.camera.setspectate, 1)
 found["hud"] = debug.getupvalue(found.char.setmovementmode, 10)
 found["gamelogic"] = debug.getupvalue(found.char.setsprint, 1)
 found["input"] = debug.getupvalue(found.gamelogic.controllerstep, 2)
-local gunsway = debug.getupvalue(loadgun, 59)
-local gunbob = debug.getupvalue(loadgun, 58)
-local gunrequire = debug.getupvalue(loadgun, 2)
 local fromaxisangle = debug.getupvalue(found.camera.step, 11)
 local physicsignore = {workspace.Players, workspace.Camera, workspace.Ignore}
 local userinputservice = game:GetService("UserInputService")
@@ -128,13 +111,13 @@ local v3 = Vector3.new()
 local newcf = CFrame.new()
 local dot = v3.Dot
 local accel = Vector3.new(0, -workspace.Gravity, 0)
-local badtick, add, reset = tick(), 0, true
+local currenttime
 
 for i, v in pairs(found) do
     getgenv()[i] = v
 
     for o, b in pairs(v) do
-        if not getgenv()[o] and type(b) == "function" then
+        if not getgenv()[o] and type(b) == "function" and islclosure(b) then
             getgenv()[o] = b
         end
     end
@@ -233,7 +216,7 @@ Esp:AddToggle({Name = "Skeleton Esp", Default = Client.Toggles.Skeleton, Callbac
     writefile('DarkHub/DarkHub_'..tostring(Game.PlaceId)..'.DARKHUB',game:GetService('HttpService'):JSONEncode({['Toggles'] = Client.Toggles,['Values'] = Client.Values}))    
 end})
 
-Misc:AddSlider({Name = "Walk Speed", Min = 0, Max = 100, Default = 0, Color = Color3.fromRGB(255,255,255), Increment = 1, ValueName = "", Callback = function(number)
+Misc:AddSlider({Name = "Walk Speed", Min = 0, Max = 250, Default = 0, Color = Color3.fromRGB(255,255,255), Increment = 1, ValueName = "", Callback = function(number)
     Client.Values.WalkSpeed = number
 
     if char.alive then
@@ -242,7 +225,7 @@ Misc:AddSlider({Name = "Walk Speed", Min = 0, Max = 100, Default = 0, Color = Co
     writefile('DarkHub/DarkHub_'..tostring(Game.PlaceId)..'.DARKHUB',game:GetService('HttpService'):JSONEncode({['Toggles'] = Client.Toggles,['Values'] = Client.Values}))    
 end})
 
-Misc:AddSlider({Name = "Jump Power", Min = 0, Max = 100, Default = 0, Color = Color3.fromRGB(255,255,255), Increment = 1, ValueName = "", Callback = function(number)
+Misc:AddSlider({Name = "Jump Power", Min = 0, Max = 250, Default = 0, Color = Color3.fromRGB(255,255,255), Increment = 1, ValueName = "", Callback = function(number)
     Client.Values.JumpPower = number
     writefile('DarkHub/DarkHub_'..tostring(Game.PlaceId)..'.DARKHUB',game:GetService('HttpService'):JSONEncode({['Toggles'] = Client.Toggles,['Values'] = Client.Values}))    
 end})
@@ -250,12 +233,6 @@ end})
 local Gravity = workspace.Gravity
 Misc:AddSlider({Name = "Gravity", Min = 0, Max = 100, Default = 0, Color = Color3.fromRGB(255,255,255), Increment = 1, ValueName = "", Callback = function(number)
     workspace.Gravity = (Gravity * 0.01) * (100 - number)
-    writefile('DarkHub/DarkHub_'..tostring(Game.PlaceId)..'.DARKHUB',game:GetService('HttpService'):JSONEncode({['Toggles'] = Client.Toggles,['Values'] = Client.Values}))    
-end})
-
-Misc:AddToggle({Name = "Invisible", Default = Client.Toggles.Invisible, Callback = function(boolean)
-    Client.Toggles.Invisible = boolean
-    reset = true
     writefile('DarkHub/DarkHub_'..tostring(Game.PlaceId)..'.DARKHUB',game:GetService('HttpService'):JSONEncode({['Toggles'] = Client.Toggles,['Values'] = Client.Values}))    
 end})
 
@@ -335,24 +312,12 @@ function network.send(self, name, ...)
                 end
             end
         end
-    elseif name == "falldamage" then
-        return
-    elseif name == "spawn" and Client.Toggles.Invisible then
-        reset = true
-    elseif name == "ping" and Client.Toggles.Invisible then
-       --reset = true
+    elseif name == "spawn" then
+        currenttime = self:getTime()
+    elseif name == "ping" or name == "falldamage" then
        return
-    elseif name == "repupdate" and Client.Toggles.Invisible then
-        if reset or args[3] - badtick > 3 then
-            badtick = args[3]
-            reset = false
-            add = 0
-        end
-       
-        args[1] = args[1] + Vector3.new(camera.cframe.LookVector.X * add * 0.01, -add, camera.cframe.LookVector.Z * add * 0.01) * 5000
-        args[2] = Vector2.new(0, args[2].Y)
-        args[3] = badtick + add
-        add = add + 0.0000025
+    elseif name == "repupdate" then
+        args[3] = currenttime
     end
 
     return send(self, name, unpack(args))
@@ -560,44 +525,53 @@ mouse.Button1Down:Connect(function()
         local cframe = CFrame.new(localpos, pos)
 
         for i = 1, math.floor(dist / 9.9) do
-            network:send("repupdate", cframe * Vector3.new(0, 0, -9.9 * i), Vector2.new(camera.angles.X, camera.angles.Y), network:getTime())
+            network:send("repupdate", cframe * Vector3.new(0, 0, -9.9 * i), Vector2.new(camera.angles.X, camera.angles.Y), currenttime)
         end
 
         char.rootpart.Position = pos
     end
 end)
 
-debug.setupvalue(loadgun, 2, function(...)
-    local data = gunrequire(...)
-    setreadonly(data, false)
-
-    if Client.Toggles.NoRecoil then
-        data["aimcamkickspeed"] = 9999999
-        data["camkickspeed"] = 9999999
-        data["modelkickspeed"] = 9999999
-    end
-
-    if Client.Toggles.NoSpread then
-        data["hipfirespreadrecover"] = 9999999
-        data["hipfirespread"] = 9999999
-    end
-
-    if Client.Toggles.SmallCrosshair then
-        data["crosssize"] = 1
-        data["crossexpansion"] = 0
-    end
-
-    return data
-end)
-
 debug.setupvalue(camera.step, 11, function(...)
     return Client.Toggles.NoCamBob and newcf or fromaxisangle(...)
 end)
 
-debug.setupvalue(loadgun, 58, function(...)
-    return Client.Toggles.NoBob and newcf or gunbob(...)
-end)
+for i, v in pairs(getgc(false)) do
+    if getinfo(v).name == "loadgun" then
+        local gunbob = debug.getupvalue(v, 57)
+        local gunsway = debug.getupvalue(v, 58)
+        local getModifiedData = debug.getupvalue(v, 1)
 
-debug.setupvalue(loadgun, 59, function(...)
-    return Client.Toggles.NoSway and newcf or gunsway(...)
-end)
+        debug.setupvalue(v, 1, function(data, mods)
+            data = getModifiedData(data, mods)
+            setreadonly(data, false)
+
+            if Client.Toggles.NoRecoil then
+                data["aimcamkickspeed"] = 9999999
+                data["camkickspeed"] = 9999999
+                data["modelkickspeed"] = 9999999
+            end
+
+            if Client.Toggles.NoSpread then
+                data["hipfirespreadrecover"] = 9999999
+                data["hipfirespread"] = 9999999
+            end
+
+            if Client.Toggles.SmallCrosshair then
+                data["crosssize"] = 1
+                data["crossexpansion"] = 0
+            end
+
+            return data
+        end)
+
+        debug.setupvalue(v, 57, function(...)
+            return Client.Toggles.NoBob and newcf or gunbob(...)
+        end)
+
+        debug.setupvalue(v, 58, function(...)
+            return Client.Toggles.NoSway and newcf or gunsway(...)
+        end)
+        break
+    end
+end
