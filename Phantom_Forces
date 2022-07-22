@@ -419,7 +419,7 @@ end
             local currentmag  = reload_upvalues[5]
 
             if currentmag > 0 or sparerounds > 0 then
-                local magsize = debug.getupvalue(currentgun.reload, 7)
+                local magsize = reload_upvalues[7]
 
                 for i = 1, number do
                     if currentmag == 0 then
@@ -632,13 +632,17 @@ end
         return WeaponData
     end)
 
-    OldGunSway = hookfunction(Functions.gunsway, function(...) --// gay ass upvalue issue :rage:
-        if Client.Toggles.NoGunSway then
-            return CFrame.new(0,0,0)
-        end
+    if Functions.gunsway then 
+        OldGunSway = hookfunction(Functions.gunsway, function(...) --// gay ass upvalue issue :rage:
+            if Client.Toggles.NoGunSway then
+                return CFrame.new(0,0,0)
+            end
 
-        return OldGunSway(...)
-    end)
+            return OldGunSway(...)
+        end)
+    else
+        warn("[ERROR]: GUNSWAY NOT FOUND!")
+    end
 
     local OldGunBob; OldGunBob = hookfunction(Functions.gunbob, function(...)
         if Client.Toggles.NoGunBob then
