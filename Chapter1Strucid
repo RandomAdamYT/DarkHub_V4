@@ -608,15 +608,6 @@ FOVCircle.Thickness = 0.5
 FOVCircle.NumSides = 16
 FOVCircle.Filled = false
 FOVCircle.Transparency = 1
--- setreadonly(getrawmetatable(game), false)
--- local __namecall = getrawmetatable(game).__namecall
--- getrawmetatable(game).__namecall = function(...)
--- if ({...})[2] == 1 and ({...})[3] == 21 then
---   return true
--- else
---   return __namecall(...)
--- end
--- end
 
 
 Services.RunService.Stepped:Connect(function()
@@ -743,17 +734,5 @@ if Config.Aimbot.Silent then
 end
 end)
 end)
-local RayHook;
-RayHook = hookfunction(workspace.FindPartOnRayWithIgnoreList,newcclosure(function(...)
-args = {...}
-if tostring(getfenv(2).script.Name) == 'MainListener' or game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Head") and game:GetService("Players").LocalPlayer.Character.Head:FindFirstChild("GliderWeld") then
-    return RayHook(...)
-end
-if tostring(getfenv(2).script.Name) == 'MainLocal' then
-    args[3] = {game:GetService("Workspace").IgnoreThese, game:GetService("Players").LocalPlayer.Character, game:GetService("Workspace").BuildStuff, game:GetService("Workspace").Map}
-    return RayHook(unpack(args))
-end
-return RayHook(...)
-end))
 
 ThankYou('Thanks for using DarkHUB V4 | Script took ' .. math.floor(os.clock() - start) .. " seconds to load.")
