@@ -9,7 +9,7 @@ if Request then
         ['Headers'] = {
             ['discordLinkRequest'] = "true"
         },
-        ['Url'] = 'https://api.darkhub.cloud/discord'
+        ['Url'] = 'https://api.darkhub.cloud/v3/discord/raw'
     })
     if r.StatusCode ~= 200 or not r.Successful then
         Invite = "dark-hub"
