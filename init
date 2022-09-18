@@ -12,7 +12,7 @@ if Request then
         ['Url'] = 'https://api.darkhub.cloud/v3/discord/raw'
     })
     if r.StatusCode ~= 200 or not r.Successful then
-        Invite = "dark-hub"
+        Invite = "darkhub"
     else
         Invite = r.Body
     end
