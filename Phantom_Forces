@@ -58,7 +58,7 @@ local IsUpToDate, Error = pcall(function()
 			SilentAim_UseFOV    = GetSave("Toggles", "SilentAim_UseFOV") or true;
             
             MagCombine          = GetSave("Toggles", "MagCombine") or false;
-            FireRate            = GetSave("Toggles", "FireRate") or false;
+           -- FireRate            = GetSave("Toggles", "FireRate") or false;
 
 			Walkspeed       	= GetSave("Toggles", "Walkspeed") or false;
 			Jumppower       	= GetSave("Toggles", "Jumppower") or false;
@@ -73,7 +73,7 @@ local IsUpToDate, Error = pcall(function()
             SmallCrosshair      = GetSave("Toggles", "SmallCrosshair") or false;
         },
 		Values = {
-			FireRateAddition 	= GetSave("Values", "FireRateAddition") or 1000;
+		--	FireRateAddition 	= GetSave("Values", "FireRateAddition") or 1000;
 			WalkspeedValue      = GetSave("Values", "WalkspeedValue") or 10;
 			JumppowerValue      = GetSave("Values", "JumppowerValue") or 10;
 			SilentAim_Radius    = GetSave("Values", "SilentAim_Radius") or 400;
@@ -575,8 +575,8 @@ end
                             Bullets[i][1]   = BulletVelocity
                             BulletsShot     = Bullets[i][2]
                         end
-                        
-                        OldSend(self, Name, Args[1], self:getTime())
+                    OldSend(self, Name, Args[1], OldGetTime(Tables.Network))
+                       --OldGetTime(Tables.Network) OldSend(self, Name, Args[1], self:getTime())
 
                         --// hit bullets
                         for i = 1, #Bullets do
@@ -682,7 +682,7 @@ end
             MemesUpvalues[3] = 0
         end
 
-        MemesUpvalues[4] = (Client.Toggles.FireRate and MemesUpvalues[4] + Client.Values.FireRateAddition) or MemesUpvalues[4] -- FireRate
+       -- MemesUpvalues[4] = (Client.Toggles.FireRate and MemesUpvalues[4] + Client.Values.FireRateAddition) or MemesUpvalues[4] -- FireRate
         MemesUpvalues[5] = ( Client.Toggles.AutomaticGuns and { true } ) or MemesUpvalues[5]
         return LoadedGun
     end)
@@ -921,27 +921,27 @@ RunInstructions({
     };
 })
 
-RunInstructions({
-    Type = "AddToggle";
-    Flag = "FireRate";
-    Tab  = Sections.Weapons;
-    Args = {
-        Name = "FireRate";
-    };
-})
+-- RunInstructions({
+--     Type = "AddToggle";
+--     Flag = "FireRate";
+--     Tab  = Sections.Weapons;
+--     Args = {
+--         Name = "FireRate";
+--     };
+-- })
 
-RunInstructions({
-    Type = "AddSlider";
-    Flag = "FireRateAddition";
-    Tab  = Sections.Weapons;
+-- RunInstructions({
+--     Type = "AddSlider";
+--     Flag = "FireRateAddition";
+--     Tab  = Sections.Weapons;
 
-    Args = {
-        Name    = "FireRate Addition";
+--     Args = {
+--         Name    = "FireRate Addition";
 
-        Min     = 0;
-	    Max     = 10000;
-    };
-})
+--         Min     = 0;
+-- 	    Max     = 10000;
+--     };
+-- })
 
 RunInstructions({
     Type = "AddToggle";
