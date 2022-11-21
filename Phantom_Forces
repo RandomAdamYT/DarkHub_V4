@@ -1,3 +1,4 @@
+game.Players.LocalPlayer:Kick('Phantom Forces is down! Currently under a re-write.')
 --[[
     Things for next update maybe:
         force prones/stances wtv
