@@ -2,10 +2,6 @@ local localplayer = game:GetService("Players").LocalPlayer
 local teleportservice = game:GetService("TeleportService")
 local httpservice = game:GetService("HttpService")
 local queue_on_teleport = queue_on_teleport or syn and syn.queue_on_teleport
-if not queue_on_teleport or not syn then
-localplayer:Kick('Not supported! | The current exploit you are using is incompatible for Phantom Forces DarkHub, sorry :(')   
-error('real sad init?')
-end
 
 localplayer.OnTeleport:Connect(function(state) -- IRay and Mickey
     if state == Enum.TeleportState.InProgress then
