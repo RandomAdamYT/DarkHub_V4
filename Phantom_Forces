@@ -1,4 +1,8 @@
 -- mickey for the idea
+if (not syn or syn.run_on_actor) then
+  game.Players.LocalPlayer:Kick('Not Supported :(')
+end
+
 syn.run_on_actor(game:GetService("ReplicatedFirst").lol.Framework:GetActor(), game:HttpGet("https://raw.githubusercontent.com/RandomAdamYT/DarkHub_V4/main/Phantom_Forces_BackUp"));
 -- local localplayer = game:GetService("Players").LocalPlayer
 --localplayer:Kick('Phantom Forces Script Is Currently Patched! Do Not POST A Screen-Shot in #Bug-Reports or YOU WILL BE BANNED')
