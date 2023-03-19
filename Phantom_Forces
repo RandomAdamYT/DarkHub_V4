@@ -1,5 +1,5 @@
 -- mickey for the idea
-if (not syn or syn.run_on_actor) then
+if not syn then
   game.Players.LocalPlayer:Kick('Not Supported :(')
 end
 
